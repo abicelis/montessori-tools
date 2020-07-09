@@ -186,6 +186,11 @@
                 <span>Golden Beads</span>
             </a>
         </li>
+        <li style="display: none;">
+            <a href="/multiplication-bead-board" id="multiplication-bead-board">
+                <span>Multipilcation Bead Board</span>
+            </a>
+        </li>
     </ul>
 
     <h3>And more on the way!</h3>
