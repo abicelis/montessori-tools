@@ -1,4 +1,6 @@
 <script>
+        console.log("start start");
+
     import { spring } from 'svelte/motion';
     import { createEventDispatcher, onMount } from 'svelte';
     import { subscribe, TOPICS } from '../../lib/pubsub';
@@ -32,6 +34,9 @@
     onMount(() => {
         if (disabled) return;
 
+        console.log("onMount, startPickedUp=" + startPickedUp);
+
+
         let initialPos = {
             x: x || offset.x,
             y: y || offset.y
@@ -40,7 +45,7 @@
 
         if (startPickedUp) {
             offset = startOffset || offset;
-            pickUp(undefined, true);
+            // pickUp(undefined, true);
         }
 
         initialRect = element.getBoundingClientRect();
@@ -48,20 +53,35 @@
 
     const update = (x, y) => {
         if (disabled) return;
+
+        // console.log("update x=" + x + " y=" + y + " startPickedUp=" + startPickedUp);
+
         coords.set({
             x: x - offset.x,
             y: y - offset.y
         });
 
-        if (startPickedUp) {
-            clearTimeout(startPickedUpTimeout);
-            startPickedUpTimeout = setTimeout(putDown, 500);
+        // if (startPickedUp) {
+        //     clearTimeout(startPickedUpTimeout);
+        //     startPickedUpTimeout = setTimeout(putDown, 500);
+        // }
+    };
+
+    var draggableEvent = (e, useStartOffset) => {
+        console.log("draggableEvent, e.view =" + e.view +" pickedUp=" + pickedUp + " startPickedUp=" + startPickedUp);
+
+        if (!pickedUp) {
+            pickUp(undefined, true);
+        } else {
+            putDown();
         }
+
     };
 
     const pickUp = (e, useStartOffset) => {
         if (disabled) return;
 
+        console.log("pickUp");
         const rect = element.getBoundingClientRect();
         if (!useStartOffset && !isRotated) {
             // TODO: Fix FireFox
@@ -90,6 +110,7 @@
     var putDown = () => {
         if (disabled) return;
 
+        console.log("putdown");
         element && (element.style.zIndex = ((parseInt(element.style.zIndex) || 100) - 100).toString());
 
         if (listener && listener.remove) {
@@ -124,7 +145,8 @@
         }
     };
 
-    let startPickedUpTimeout = setTimeout(putDown, 500);
+    // console.log("startPickedUpTimeout");
+    // let startPickedUpTimeout = setTimeout(putDown, 500);
 </script>
 
 <style>
@@ -136,8 +158,7 @@
 <div
     {...$$restProps}
     bind:this={element}
-    on:mousedown={pickUp}
-    on:touchstart={pickUp}
+    on:mouseup={draggableEvent}
     on:wheel|stopPropagation={onWheel}
     class:draggable={!disabled}
     class:pickedUp={pickedUp}
@@ -149,6 +170,6 @@
     <slot />
 </div>
 
-<svelte:window 
-    on:mouseup={putDown}
-    on:touchend={putDown} />
+<!-- <svelte:window 
+    on:mouseup={draggableEvent}
+ /> -->
